@@ -1,17 +1,17 @@
 Package: SignatureFinder
 Title: Finding the gene signature.
-Version: 0.0.0.9000
+Version: 1.0
 Authors@R: person("Monika", "Lapinska", email = "lapinskamonika@o2.pl",
    role = c("aut", "cre"))
 Description: Find the gene signature and use it to classifier new
     samples into specific types of cancer
 Depends:
-    R (>= 3.1.0)
-Imports:
-    topGO,
-    org.Hs.eg.db,
+    R (>= 3.1.0),
     e1071,
     randomForest
+Imports:
+    topGO,
+    org.Hs.eg.db
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
