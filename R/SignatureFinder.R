@@ -64,7 +64,7 @@ signature.algorithm <- function(table, x, k=100,m=20,p=0.05,
 
 
    matrix.gene.GOfunction <- function(table){
-      names_of_gene <- colnames(dane)[-dim(dane)[2]]
+      names_of_gene <- colnames(table)[-dim(table)[2]]
       gene_function <- select(org.Hs.eg.db,
                               keys = names_of_gene,
                               keytype = "SYMBOL",
