@@ -12,3 +12,14 @@ Another adventage of the package is to create SVM classifier or random forests c
 library(devtools)
 install_github("geneticsMiNIng/SignatureFinder")
 ```
+It is necessary to install two additional package from bioconductor.
+
+```{r}
+source("https://bioconductor.org/biocLite.R")
+biocLite("topGO")
+biocLite("org.Hs.eg.db")
+library(topGO)
+library(org.Hs.eg.db)
+```
+
+
