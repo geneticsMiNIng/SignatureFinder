@@ -8,3 +8,7 @@ Another adventage of the package is to create SVM classifier or random forests c
 
 #Install
 
+```{r}
+library(devtools)
+install_github("geneticsMiNIng/SignatureFinder")
+```
