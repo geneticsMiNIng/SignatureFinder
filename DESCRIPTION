@@ -1,9 +1,10 @@
 Package: SignatureFinder
 Title: Finding the gene signature.
 Version: 1.0
-Authors@R: person("Monika", "Lapinska", email = "lapinskamonika@o2.pl",
-   role = c("aut", "cre")),
-   person("geneticsMiNIng", "https://github.com/geneticsMiNIng" role=c("cph"))
+Authors@R: c(
+   person("Monika", "Lapinska", email = "lapinskamonika@o2.pl", role = c("aut", "cre")),
+   person("geneticsMiNIng", "https://github.com/geneticsMiNIng", role=c("cph"))
+   )
 Description: SignatureFinder builds the gene signature, using statistical methods 
    and knowledge contained in the Gene Ontology. First, using the Kruskal-Wallis test, 
    selects genes which most differentiate specific types of cancer. 
