@@ -2,19 +2,35 @@
 title: "SignatureFinder"
 author: "Monika Lapinska"
 date: "11 October 2016"
-output: html_document
+output: pdf_document
 ---
 #Intall
 
-```{r}
-#library(devtools)
-#install_github("lapinskam/SignatureFinder")
+```{r,message=FALSE}
+library(devtools)
+install_github("geneticsMiNIng/SignatureFinder")
+```
+
+It is necessary to install two additional package from bioconductor.
+
+```{r,message=FALSE}
+# source("https://bioconductor.org/biocLite.R")
+# biocLite("topGO")
+# biocLite("org.Hs.eg.db")
+library(topGO)
+library(org.Hs.eg.db)
 ```
 
 
-
 #Overview
-This document present an overview of the SignatureFinder package. Package was built to find the gene signature. It has only one function signature.algorithm(). One of the output result is vector with gene  signature, the most important genes to recognize type of the cancer. Second possible output result is two element list which first is a clasifier and  the second is vector with gene signature. To find gene signature, algorithm uses a Kruskal-Wallis test and base of characteristic function from Gene Ontology.
+This document present an overview of the SignatureFinder package. Package 
+was built to find the gene signature. It has only one function 
+signature.algorithm(). One of the output result is vector with gene  
+signature, the most important genes to recognize type of the cancer. 
+Second possible output result is two element list which first is 
+a classifier and  the second is vector with gene signature. To find gene 
+signature, algorithm uses a Kruskal-Wallis test and base of characteristic 
+function from Gene Ontology.
 
 
 #Example
@@ -38,14 +54,17 @@ In this example we use only three type of cancer.
 Names_of_cancers <- c("TCGA Lung Adenocarcinoma"
                       ,"TCGA Rectal Cancer"
                       ,"TCGA Bladder Cancer")
-clinical <- clinical.cb[which(clinical.cb$X_cohort%in%Names_of_cancers),c("sampleID","X_cohort")]
+clinical <- clinical.cb[which(clinical.cb$X_cohort%in%Names_of_cancers),
+                        c("sampleID","X_cohort")]
 clinical$sampleID <- gsub("-",".",clinical$sampleID)
-expression <- expression[,c(1,which(colnames(expression)%in%clinical$sampleID))]
+expression <- expression[,c(1,which(colnames(expression)%in%
+                                       clinical$sampleID))]
 ```
 
 
-We need to do some transformation of the data, because function signature.algorithm()
-need data.frame where columns contain genes and rows contain samples. 
+We need to do some transformation of the data, because function 
+signature.algorithm() need data.frame where columns contain genes 
+and rows contain samples. 
 
 
 ```{r}
@@ -56,9 +75,12 @@ n <- expression$Sample
 expression_t <- as.data.frame(t(expression[,-1]))
 colnames(expression_t) <- n
 disease <- character()
-disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$X_cohort=="TCGA Lung Adenocarcinoma")])] <- "Lung"
-disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$X_cohort=="TCGA Rectal Cancer")])] <- "Rectal"
-disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$X_cohort=="TCGA Bladder Cancer")])] <- "Bladder"
+disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$
+         X_cohort=="TCGA Lung Adenocarcinoma")])] <- "Lung"
+disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$
+         X_cohort=="TCGA Rectal Cancer")])] <- "Rectal"
+disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$
+         X_cohort=="TCGA Bladder Cancer")])] <- "Bladder"
 expression_t <- cbind(expression_t,disease)
 ```
 
@@ -69,64 +91,142 @@ expression_t[1:5,c(sample(1:dim(expression_t)[2]-1,5),dim(expression_t)[2])]
 
 ```
 
-
-
-Now we can use Signature.algorithm() to find gene signature. There is five diferent method to calculate gene signature. We will briefly describe each of them.
-all.all.med - For k best genes selected using Kruskal-Wallis test choose all characteristic function. Then for each gene we use all its fisher values compatible with characteristic function. Next step is to calculate median for k best genes and as signature accepts k best genes and other which are smaller then median.
-
-all.min.max - For k best genes selected using Kruskal-Wallis test choose all characteristic function. Then for each gene we use minimal fisher values compatible with characteristic function. Next step is to calculate maximum for k best genes and as signature accepts k best genes which are smaller then maximum.
-
-all.5.med - For k best genes selected using Kruskal-Wallis test choose all characteristic function. Then for each gene we use 5 smalest its fisher values compatible with characteristic function. Next step is to calculate median for k best genes and as signature accepts k best genes and other which are smaller then median.
-
-m.all.max - For k best genes selected using Kruskal-Wallis test choose only m  characteristic function. Then for each gene we use all its fisher values compatible with characteristic function. Next step is to calculate maximum for k best genes and as signature accepts k best genes which are smaller then maximum.
-
-p.all.med - For k best genes selected using Kruskal-Wallis test choose only this  characteristic function which p-value are smaller then p. Then for each gene we use all its fisher values compatible with characteristic function. Next step is to calculate median for k best genes and as signature accepts k best genes and other which are smaller then median.
-
-To show how this function work, we need to choose method and parameters k and p.
-
-```{r, echo=FALSE, message=FALSE}
-dane <- expression_t[,c(sample(1:dim(expression_t)[2],300),dim(expression_t)[2])]
-library(org.Hs.eg.db)
-library(topGO)
-library(e1071)
-library(randomForest)
+We want to show only example of usage, so we select a subset of genes. 
+```{r, message=FALSE}
+expression_data <- expression_t[,c(sample(1:dim(expression_t)[2],300),
+                                   dim(expression_t)[2])]
 ```
 
+
+Now we can use Signature.algorithm() to find gene signature. There is five 
+diferent method to calculate gene signature. We will briefly describe 
+each of them.
+
+all.all.med - For k best genes selected using Kruskal-Wallis test choose all
+characteristic function. Then for each gene we use all its fisher values 
+compatible with characteristic function. Next step is to calculate median 
+for k best genes and as signature accepts k best genes and other which are 
+smaller then median.
+
 ```{r, message=FALSE}
-SignatureFinder::signature.algorithm(dane,"disease",k=20,signature.method="p.all.med",p=0.05)
+SignatureFinder::signature.algorithm(expression_data,"disease",k=20,
+                                     signature.method="all.all.med")
 ```
 
-Second possible of output is create clasifier. We can choose from Random Forest and SVM method. But we also have a vector of gene signature. In this case, the output is a list where first component is clasifier and second component is vector with gene signature.
-
-Again, we can choose method to calculate the signature, but this time we leave the default settings. Only we need to change is out parameter. 
-
-We want to show how good is the clasifier so we need to choose train and test data. And use function only on the training data.
+all.min.max - For k best genes selected using Kruskal-Wallis test choose all
+characteristic function. Then for each gene we use minimal fisher values 
+compatible with characteristic function. Next step is to calculate maximum 
+for k best genes and as signature accepts k best genes which are smaller 
+then maximum.
 
 ```{r, message=FALSE}
-indeks_train <- sample(1:dim(dane)[1],dim(dane)[1]*2/3)
-dane_train <- dane[indeks_train,]
-dane_test <- dane[-indeks_train,]
-SVM.out <- SignatureFinder::signature.algorithm(dane_train,"disease",k=20,
-                                                out="predictive.SVM")
-clasifier <- SVM.out[[1]]
+SignatureFinder::signature.algorithm(expression_data,"disease",k=20,
+                                     signature.method="all.min.max")
+```
+
+all.5.med - For k best genes selected using Kruskal-Wallis test choose all 
+characteristic function. Then for each gene we use 5 smalest its fisher 
+values compatible with characteristic function. Next step is to calculate 
+median for k best genes and as signature accepts k best genes and other 
+which are smaller then median.
+
+```{r, message=FALSE}
+SignatureFinder::signature.algorithm(expression_data,"disease",k=20,
+                                     signature.method="all.5.med")
+```
+
+
+m.all.max - For k best genes selected using Kruskal-Wallis test choose only 
+m  characteristic function. Then for each gene we use all its fisher values 
+compatible with characteristic function. Next step is to calculate maximum 
+for k best genes and as signature accepts k best genes which are smaller 
+then maximum.
+
+```{r, message=FALSE}
+SignatureFinder::signature.algorithm(expression_data,"disease",k=20,
+                                     signature.method="m.all.max",m=15)
+```
+
+p.all.med - For k best genes selected using Kruskal-Wallis test choose only 
+this  characteristic function which p-value are smaller then p. Then for 
+each gene we use all its fisher values compatible with characteristic 
+function. Next step is to calculate median for k best genes and as signature
+accepts k best genes and other which are smaller then median.
+
+```{r, message=FALSE}
+SignatureFinder::signature.algorithm(expression_data,"disease",k=20,
+                                     signature.method="p.all.med",p=0.02)
+```
+
+Second possible of output is create classifier. We can choose from 
+Random Forest and SVM method. But we also have a vector of gene signature. 
+In this case, the output is a list where first component is classifier 
+and second component is vector with gene signature.
+
+Again, we can choose method to calculate the signature, but this time we 
+leave the default settings. Only we need to change is out parameter. 
+
+We want to show how good is the classifier so we need to choose train and 
+test data. And use function only on the training data. We show how to built 
+classifier in bothmethod SVM and random forest. We use default settings in 
+method to calculate the signature, hence that in both signature there are 
+the same genes.
+
+```{r, message=FALSE}
+set.seed(123)
+indeks_train <-sample(1:dim(expression_data)[1],dim(expression_data)[1]*2/3)
+data_train <- expression_data[indeks_train,]
+data_test <- expression_data[-indeks_train,]
+SVM.out <- SignatureFinder::signature.algorithm(data_train,"disease",k=20,
+                                             out="predictive.SVM")
+RF.out <- SignatureFinder::signature.algorithm(data_train,"disease",k=20,
+                                             out="predictive.RandomForest")
+clasifier_SVM <- SVM.out[[1]]
+clasifier_RF <- RF.out[[1]]
 signature <- SVM.out[[2]]
+
+
 ```
 
 Now we transform test data and then show the contingency table of the result. 
 
 
 ```{r, message=FALSE}
-names_of_gene <- colnames(dane_test)[-dim(dane_test)[2]]
+names_of_gene <- colnames(data_test)[-dim(data_test)[2]]
 index_of_gene <- which(names_of_gene %in% signature)
-dane_test_sig <- dane_test[,index_of_gene]
-y <- dane_test[,dim(dane_test)[2]]
+data_test_sig <- data_test[,index_of_gene]
+y <- data_test[,dim(data_test)[2]]
 y <- as.factor(y)
-dane_test_sig <- data.frame(dane_test_sig)
-score <- predict(clasifier,dane_test_sig)
-table(pred=score,real=y)
+data_test_sig <- data.frame(data_test_sig)
+score_SVM <- predict(clasifier_SVM,data_test_sig)
+score_RF <- predict(clasifier_RF,data_test_sig)
 ```
 
+```{r,echo=FALSE, message=FALSE}
+score_SVM <- as.character(score_SVM)
+score_SVM[which(score_SVM=="1")] <- "Bladder"
+score_SVM[which(score_SVM=="2")] <- "Lung"
+score_SVM[which(score_SVM=="3")] <- "Rectal"
+score_SVM <- as.factor(score_SVM)
+```
 
+Result of SVM classifier:
+```{r, message=FALSE}
+table(pred=score_SVM,real=y)
+```
+
+```{r,echo=FALSE, message=FALSE}
+score_RF <- as.character(score_RF)
+score_RF[which(score_RF=="1")] <- "Bladder"
+score_RF[which(score_RF=="2")] <- "Lung"
+score_RF[which(score_RF=="3")] <- "Rectal"
+score_RF <- as.factor(score_RF)
+```
+
+Result of random forest classifier:
+```{r, message=FALSE}
+table(pred=score_RF,real=y)
+```
 
 ```{r, echo=FALSE}
 
