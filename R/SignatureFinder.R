@@ -20,6 +20,47 @@
 #' @return Signature - vector with genes name. Clasifier of method SVM or
 #' Random Forest.
 #'
+#'@examples
+#'\dontrun{
+#' library(RTCGA.PANCAN12)
+#' data("expression.cb1")
+#' data("expression.cb2")
+#' expression <- rbind(expression.cb1,expression.cb2)
+#' data("clinical.cb")
+#'Names_of_cancers <- c("TCGA Lung Adenocarcinoma"
+#'                      ,"TCGA Rectal Cancer"
+#'                      ,"TCGA Bladder Cancer")
+#'clinical <- clinical.cb[which(clinical.cb$X_cohort%in%Names_of_cancers),
+#'                        c("sampleID","X_cohort")]
+#'clinical$sampleID <- gsub("-",".",clinical$sampleID)
+#'expression <- expression[,c(1,which(colnames(expression)%in%
+#'                                       clinical$sampleID))]
+#'expression <- expression[!is.na(rowSums(expression[,-1])),]
+#'n <- expression$Sample
+#'expression_t <- as.data.frame(t(expression[,-1]))
+#'colnames(expression_t) <- n
+#'disease <- character()
+#'disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$
+#'         X_cohort=="TCGA Lung Adenocarcinoma")])] <- "Lung"
+#'disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$
+#'         X_cohort=="TCGA Rectal Cancer")])] <- "Rectal"
+#'disease[which(rownames(expression_t)%in%clinical$sampleID[which(clinical$
+#'         X_cohort=="TCGA Bladder Cancer")])] <- "Bladder"
+#'expression_t <- cbind(expression_t,disease)
+#'
+#'set.seed(123)
+#'expression_data <- expression_t[,c(sample(1:dim(expression_t)[2],300),
+#'                                   dim(expression_t)[2])]
+#'SignatureFinder::signature.algorithm(expression_data,"disease",k=20,
+#'                                    signature.method="all.all.med")
+#'indeks_train <-sample(1:dim(expression_data)[1],dim(expression_data)[1]*2/3)
+#'data_train <- expression_data[indeks_train,]
+#'data_test <- expression_data[-indeks_train,]
+#'SVM.out <- SignatureFinder::signature.algorithm(data_train,"disease",k=20,
+#'                                             out="predictive.SVM")
+#'clasifier_SVM <- SVM.out[[1]]
+#'signature <- SVM.out[[2]]
+#'}
 #' @export
 
 signature.algorithm <- function(table, x, k=100,m=20,p=0.05,
