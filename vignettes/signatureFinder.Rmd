@@ -93,6 +93,7 @@ expression_t[1:5,c(sample(1:dim(expression_t)[2]-1,5),dim(expression_t)[2])]
 
 We want to show only example of usage, so we select a subset of genes. 
 ```{r, message=FALSE}
+set.seed(123)
 expression_data <- expression_t[,c(sample(1:dim(expression_t)[2],300),
                                    dim(expression_t)[2])]
 ```
@@ -201,7 +202,7 @@ data_test_sig <- data.frame(data_test_sig)
 score_SVM <- predict(clasifier_SVM,data_test_sig)
 score_RF <- predict(clasifier_RF,data_test_sig)
 ```
-
+\newpage
 ```{r,echo=FALSE, message=FALSE}
 score_SVM <- as.character(score_SVM)
 score_SVM[which(score_SVM=="1")] <- "Bladder"
