@@ -4,7 +4,7 @@ author: "Monika Lapinska"
 date: "11 October 2016"
 output: pdf_document
 ---
-#Intall
+#Install
 
 ```{r,message=FALSE}
 library(devtools)
