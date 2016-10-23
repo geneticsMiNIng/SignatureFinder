@@ -1,4 +1,4 @@
-#' Find gene signature or/and built clasifier.
+#' SignatureFinder builds the gene signature, using statistical methods and knowledge contained in the Gene Ontology.
 #'
 #' @param table Data frame with gene in columns and patients or sample
 #' in rows
